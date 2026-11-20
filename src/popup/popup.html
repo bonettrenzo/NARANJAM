@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>NARANJAM</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Roboto", Arial, sans-serif; }
+
+    body {
+      width: 230px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 14px;
+      user-select: none;
+    }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fbbf24;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Velocidad actual grande */
+    .big-rate {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 700;
+      color: #fbbf24;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .big-label {
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 14px;
+    }
+
+    /* Ajuste fino ±0.05 */
+    .fine {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .fine button {
+      flex: 1;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      color: #eee;
+      font-size: 13px;
+      padding: 7px 0;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .fine button:hover { background: rgba(255,255,255,0.2); }
+    .fine .step-label {
+      font-size: 10px;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    /* Input personalizado */
+    .custom-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .custom-row input {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      padding: 7px 8px;
+      outline: none;
+      text-align: center;
+    }
+    .custom-row input:focus {
+      border-color: #fbbf24;
+    }
+    .custom-row button {
+      background: #fbbf24;
+      border: none;
+      border-radius: 6px;
+      color: #1a1a1a;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 10px;
+      cursor: pointer;
+    }
+    .custom-row button:hover { background: #f0b020; }
+
+    /* Presets rápidos */
+    .presets-label {
+      font-size: 10px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .presets button {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 5px;
+      color: #ccc;
+      font-size: 11px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .presets button:hover { background: rgba(255,255,255,0.18); }
+    .presets button.active {
+      background: #fbbf24;
+      border-color: #fbbf24;
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+
+    /* Status */
+    #status {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+    }
+
+    .hints {
+      font-size: 10px;
+      color: #555;
+      line-height: 1.6;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      padding-top: 8px;
+    }
+    .hints b { color: #777; }
+  </style>
+</head>
+<body>
+  <h2>⚡ NARANJAM</h2>
+
+  <div id="main" style="display:none">
+    <div class="big-rate" id="bigRate">1</div>
+    <div class="big-label">velocidad actual</div>
+
+    <!-- Ajuste fino -->
+    <div class="fine">
+      <button id="minus05">−0.05</button>
+      <span class="step-label">ajuste fino</span>
+      <button id="plus05">+0.05</button>
+    </div>
+
+    <!-- Input libre -->
+    <div class="custom-row">
+      <input id="customInput" type="number" min="0.1" max="4" step="0.05" placeholder="ej. 1.07" />
+      <button id="applyBtn">Aplicar</button>
+    </div>
+
+    <!-- Presets rápidos -->
+    <div class="presets-label">presets rápidos</div>
+    <div class="presets" id="presets"></div>
+
+    <div class="hints">
+      <b>Atajos en la página:</b><br>
+      <b>+</b> / <b>-</b> → ±0.25x &nbsp; <b>r</b> → 1x &nbsp; <b>c</b> → 2x
+    </div>
+  </div>
+
+  <div id="status">Cargando...</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
