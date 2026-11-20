@@ -7,72 +7,171 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Roboto", Arial, sans-serif; }
 
     body {
-      width: 230px;
-      background: #1a1a1a;
+      width: 240px;
+      background: #111;
       color: #fff;
-      padding: 14px;
-      user-select: none;
+      overflow: hidden;
     }
 
-    h2 {
+    /* ── Encabezado ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .header .back {
+      background: none;
+      border: none;
+      color: #fbbf24;
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 4px 0 0;
+    }
+    .header h2 {
       font-size: 13px;
       font-weight: 700;
       color: #fbbf24;
-      margin-bottom: 12px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.4px;
+      flex: 1;
+    }
+    .header .subtitle {
+      font-size: 11px;
+      color: #555;
     }
 
-    /* Velocidad actual grande */
+    /* ── Vistas ── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── Menú principal ── */
+    .menu-list {
+      padding: 8px 0;
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: background 0.12s;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item:hover { background: rgba(255,255,255,0.06); }
+    .menu-item .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .menu-item .icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+    .menu-item .info .title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #eee;
+    }
+    .menu-item .info .desc {
+      font-size: 10px;
+      color: #555;
+      margin-top: 1px;
+    }
+    .menu-item .badge {
+      font-size: 11px;
+      color: #fbbf24;
+      font-weight: 700;
+    }
+    .menu-item .arrow {
+      font-size: 12px;
+      color: #444;
+    }
+    .menu-item.disabled { opacity: 0.35; pointer-events: none; }
+    .coming-soon {
+      font-size: 9px;
+      background: rgba(251,191,36,0.15);
+      color: #fbbf24;
+      border-radius: 3px;
+      padding: 2px 5px;
+    }
+
+    /* ── Vista velocidad ── */
+    .speed-view {
+      padding: 14px;
+    }
     .big-rate {
       text-align: center;
-      font-size: 36px;
+      font-size: 42px;
       font-weight: 700;
       color: #fbbf24;
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .big-label {
       text-align: center;
-      font-size: 11px;
-      color: #666;
+      font-size: 10px;
+      color: #444;
       margin-bottom: 14px;
     }
 
-    /* Ajuste fino ±0.05 */
+    /* Ajuste fino */
     .fine {
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .fine button {
       flex: 1;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 6px;
       color: #eee;
-      font-size: 13px;
+      font-size: 12px;
       padding: 7px 0;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: background 0.12s;
     }
-    .fine button:hover { background: rgba(255,255,255,0.2); }
-    .fine .step-label {
+    .fine button:hover { background: rgba(255,255,255,0.18); }
+    .fine .step-label { font-size: 10px; color: #444; white-space: nowrap; }
+
+    /* Pasos del ajuste fino */
+    .step-selector {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+      justify-content: center;
+    }
+    .step-selector button {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px;
+      color: #888;
       font-size: 10px;
-      color: #555;
-      white-space: nowrap;
+      padding: 3px 7px;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .step-selector button.active {
+      background: rgba(251,191,36,0.2);
+      border-color: #fbbf24;
+      color: #fbbf24;
     }
 
-    /* Input personalizado */
+    /* Input libre */
     .custom-row {
       display: flex;
       gap: 6px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .custom-row input {
       flex: 1;
       background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 6px;
       color: #fff;
       font-size: 14px;
@@ -80,99 +179,149 @@
       outline: none;
       text-align: center;
     }
-    .custom-row input:focus {
-      border-color: #fbbf24;
-    }
+    .custom-row input:focus { border-color: #fbbf24; }
     .custom-row button {
       background: #fbbf24;
       border: none;
       border-radius: 6px;
-      color: #1a1a1a;
+      color: #111;
       font-size: 12px;
       font-weight: 700;
       padding: 7px 10px;
       cursor: pointer;
     }
-    .custom-row button:hover { background: #f0b020; }
+    .custom-row button:hover { background: #e0a800; }
 
-    /* Presets rápidos */
-    .presets-label {
-      font-size: 10px;
-      color: #555;
-      margin-bottom: 6px;
-    }
+    /* Presets */
+    .presets-label { font-size: 10px; color: #444; margin-bottom: 6px; }
     .presets {
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .presets button {
-      background: rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.1);
       border-radius: 5px;
-      color: #ccc;
+      color: #bbb;
       font-size: 11px;
       padding: 4px 8px;
       cursor: pointer;
       transition: background 0.1s;
     }
-    .presets button:hover { background: rgba(255,255,255,0.18); }
+    .presets button:hover { background: rgba(255,255,255,0.15); }
     .presets button.active {
       background: #fbbf24;
       border-color: #fbbf24;
-      color: #1a1a1a;
+      color: #111;
       font-weight: 700;
     }
 
-    /* Status */
-    #status {
-      font-size: 11px;
-      color: #888;
-      text-align: center;
-    }
-
+    /* Hints */
     .hints {
       font-size: 10px;
-      color: #555;
+      color: #444;
       line-height: 1.6;
-      border-top: 1px solid rgba(255,255,255,0.07);
+      border-top: 1px solid rgba(255,255,255,0.06);
       padding-top: 8px;
     }
-    .hints b { color: #777; }
+    .hints b { color: #666; }
+
+    /* Status genérico */
+    #status {
+      font-size: 11px;
+      color: #666;
+      text-align: center;
+      padding: 20px 14px;
+    }
   </style>
 </head>
 <body>
-  <h2>⚡ NARANJAM</h2>
 
-  <div id="main" style="display:none">
-    <div class="big-rate" id="bigRate">1</div>
-    <div class="big-label">velocidad actual</div>
-
-    <!-- Ajuste fino -->
-    <div class="fine">
-      <button id="minus05">−0.05</button>
-      <span class="step-label">ajuste fino</span>
-      <button id="plus05">+0.05</button>
+  <!-- ── VISTA: Menú principal ── -->
+  <div id="view-home" class="view active">
+    <div class="header">
+      <h2>⚡ NARANJAM</h2>
+      <span class="subtitle" id="nowPlaying"></span>
     </div>
+    <div class="menu-list">
+      <div class="menu-item" id="menu-speed">
+        <div class="left">
+          <span class="icon">🎚️</span>
+          <div class="info">
+            <div class="title">Velocidad de audio</div>
+            <div class="desc">Ajusta la velocidad de reproducción</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="badge" id="speedBadge">1x</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
 
-    <!-- Input libre -->
-    <div class="custom-row">
-      <input id="customInput" type="number" min="0.1" max="4" step="0.05" placeholder="ej. 1.07" />
-      <button id="applyBtn">Aplicar</button>
+      <div class="menu-item disabled" id="menu-crossfade">
+        <div class="left">
+          <span class="icon">🎵</span>
+          <div class="info">
+            <div class="title">Crossfade</div>
+            <div class="desc">Fundido entre canciones</div>
+          </div>
+        </div>
+        <span class="coming-soon">próximo</span>
+      </div>
+
+      <div class="menu-item disabled" id="menu-eq">
+        <div class="left">
+          <span class="icon">🎛️</span>
+          <div class="info">
+            <div class="title">Ecualizador</div>
+            <div class="desc">Ajusta bajos, medios y agudos</div>
+          </div>
+        </div>
+        <span class="coming-soon">próximo</span>
+      </div>
     </div>
-
-    <!-- Presets rápidos -->
-    <div class="presets-label">presets rápidos</div>
-    <div class="presets" id="presets"></div>
-
-    <div class="hints">
-      <b>Atajos en la página:</b><br>
-      <b>+</b> / <b>-</b> → ±0.25x &nbsp; <b>r</b> → 1x &nbsp; <b>c</b> → 2x
-    </div>
+    <div id="status" style="display:none"></div>
   </div>
 
-  <div id="status">Cargando...</div>
+  <!-- ── VISTA: Velocidad de audio ── -->
+  <div id="view-speed" class="view">
+    <div class="header">
+      <button class="back" id="backBtn">‹</button>
+      <h2>Velocidad de audio</h2>
+    </div>
+    <div class="speed-view">
+      <div class="big-rate" id="bigRate">1x</div>
+      <div class="big-label">velocidad actual</div>
+
+      <div class="fine">
+        <button id="minusBtn">−</button>
+        <span class="step-label">paso:</span>
+        <button id="plusBtn">+</button>
+      </div>
+
+      <div class="step-selector">
+        <button class="step-btn active" data-step="0.05">0.05</button>
+        <button class="step-btn" data-step="0.1">0.1</button>
+        <button class="step-btn" data-step="0.25">0.25</button>
+        <button class="step-btn" data-step="0.5">0.5</button>
+      </div>
+
+      <div class="custom-row">
+        <input id="customInput" type="number" min="0.1" max="4" step="0.05" placeholder="ej. 1.07" />
+        <button id="applyBtn">Aplicar</button>
+      </div>
+
+      <div class="presets-label">presets rápidos</div>
+      <div class="presets" id="presets"></div>
+
+      <div class="hints">
+        <b>Atajos en la página:</b><br>
+        <b>+</b> / <b>-</b> → ±0.25x &nbsp; <b>r</b> → 1x &nbsp; <b>c</b> → 2x
+      </div>
+    </div>
+  </div>
 
   <script src="popup.js"></script>
 </body>
