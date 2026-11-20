@@ -1,3 +1,5 @@
+import { CROSSFADE_KEY, MAX_FADE_SECONDS, normalizeCrossfade } from './crossfade-settings.js'
+
 const PRESETS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3]
 
 // ── Estado ────────────────────────────────────────────────────────────────────
@@ -33,6 +35,71 @@ document.getElementById('menu-speed').addEventListener('click', () => {
 
 backBtn.addEventListener('click', () => {
   showView('view-home')
+})
+
+const crossfadeForm = document.getElementById('crossfadeForm')
+const crossfadeEnabled = document.getElementById('crossfadeEnabled')
+const fadeOut = document.getElementById('fadeOut')
+const fadeIn = document.getElementById('fadeIn')
+const crossfadeConnection = document.getElementById('crossfadeConnection')
+const crossfadeStatus = document.getElementById('crossfadeStatus')
+const saveCrossfade = crossfadeForm.querySelector('button[type="submit"]')
+
+document.getElementById('menu-crossfade').addEventListener('click', async () => {
+  showView('view-crossfade')
+  crossfadeConnection.textContent = ''
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    if (!tab?.url || new URL(tab.url).hostname !== 'music.youtube.com') {
+      crossfadeConnection.textContent = 'Abre YouTube Music para usar el fundido.'
+      return
+    }
+    const response = await chrome.tabs.sendMessage(tab.id, { type: 'GET_CROSSFADE_STATUS' })
+    if (response?.ready === true) {
+      crossfadeConnection.textContent = 'Reproductor conectado'
+    } else if (response?.ready === false) {
+      crossfadeConnection.textContent = 'Reproduce una canción para cargar el botón Siguiente.'
+    } else {
+      crossfadeConnection.textContent = 'Recarga la pestaña de YouTube Music para activar el fundido.'
+    }
+  } catch {
+    crossfadeConnection.textContent = 'Recarga la pestaña de YouTube Music para activar el fundido.'
+  }
+})
+
+document.getElementById('crossfadeBack').addEventListener('click', () => {
+  showView('view-home')
+})
+
+fadeOut.max = fadeIn.max = MAX_FADE_SECONDS
+chrome.storage.local.get(CROSSFADE_KEY, (stored) => {
+  const settings = normalizeCrossfade(stored?.[CROSSFADE_KEY])
+  crossfadeEnabled.checked = settings.enabled
+  fadeOut.value = settings.fadeOut
+  fadeIn.value = settings.fadeIn
+  saveCrossfade.disabled = false
+})
+
+crossfadeForm.addEventListener('input', () => {
+  crossfadeStatus.textContent = ''
+})
+
+crossfadeForm.addEventListener('submit', async (event) => {
+  event.preventDefault()
+  saveCrossfade.disabled = true
+  const settings = normalizeCrossfade({
+    enabled: crossfadeEnabled.checked,
+    fadeOut: fadeOut.valueAsNumber,
+    fadeIn: fadeIn.valueAsNumber
+  })
+  try {
+    await chrome.storage.local.set({ [CROSSFADE_KEY]: settings })
+    crossfadeStatus.textContent = 'Guardado'
+  } catch {
+    crossfadeStatus.textContent = 'No se pudo guardar'
+  } finally {
+    saveCrossfade.disabled = false
+  }
 })
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

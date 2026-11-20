@@ -1,4 +1,5 @@
 import { clampSpeed, setVideoSpeed, readPrefSpeed, savePrefSpeed } from './speed.js'
+import { bindCrossfade } from './crossfade.js'
 
 /**
  * Content script — solo lógica, sin UI flotante.
@@ -7,6 +8,7 @@ import { clampSpeed, setVideoSpeed, readPrefSpeed, savePrefSpeed } from './speed
 
 function getVideo() {
   return (
+    document.querySelector('#movie_player video.html5-main-video') ||
     document.querySelector('video.html5-main-video') ||
     document.querySelector('video')
   )
@@ -88,4 +90,10 @@ function waitAndInit(retries = 40) {
   if (retries > 0) setTimeout(() => waitAndInit(retries - 1), 500)
 }
 
-waitAndInit()
+if (location.hostname === 'music.youtube.com') bindCrossfade(getVideo)
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => waitAndInit(), { once: true })
+} else {
+  waitAndInit()
+}

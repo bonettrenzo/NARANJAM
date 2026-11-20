@@ -12,6 +12,10 @@ de velocidad de reproducción sobre el reproductor de YouTube.
   - `c` : cambiar a 2x
 - La velocidad elegida se recuerda y se re-aplica al navegar entre videos.
 - Si cambias la velocidad desde el menú nativo de YouTube, también se recuerda.
+- En YouTube Music, **Siguiente** baja el volumen de la pista actual antes de
+  avanzar y lo sube al empezar la nueva. En **NARANJAM → Crossfade** puedes
+  ajustar cada fundido entre 0 y 10 segundos o desactivar la función. El valor
+  inicial es de 2 segundos por fundido.
 
 ## Cargar la extensión en Chrome
 

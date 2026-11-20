@@ -15,6 +15,7 @@ function copyPopupPlugin() {
     closeBundle() {
       copyFileSync('src/popup/popup.html', 'dist/popup.html')
       copyFileSync('src/popup/popup.js',   'dist/popup.js')
+      copyFileSync('src/crossfade-settings.js', 'dist/crossfade-settings.js')
     }
   }
 }

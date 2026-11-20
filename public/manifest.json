@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "NARANJAM - Control de YouTube",
-  "version": "0.2.0",
-  "description": "Control de velocidad de reproducción en YouTube y YouTube Music.",
+  "version": "0.3.0",
+  "description": "Control de velocidad en YouTube y fundidos en YouTube Music.",
   "permissions": ["storage", "tabs"],
   "host_permissions": [
     "https://www.youtube.com/*",
@@ -21,7 +21,7 @@
         "https://music.youtube.com/*"
       ],
       "js": ["content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ]
 }

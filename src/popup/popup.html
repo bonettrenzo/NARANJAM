@@ -61,6 +61,14 @@
     }
     .menu-item:last-child { border-bottom: none; }
     .menu-item:hover { background: rgba(255,255,255,0.06); }
+    button.menu-item {
+      width: 100%;
+      background: none;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-align: left;
+    }
+    button.menu-item:hover { background: rgba(255,255,255,0.06); }
     .menu-item .left {
       display: flex;
       align-items: center;
@@ -228,6 +236,41 @@
     }
     .hints b { color: #666; }
 
+    .crossfade-form {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      font-size: 12px;
+      color: #eee;
+    }
+    .crossfade-form label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .crossfade-form input[type="number"] {
+      width: 62px;
+      padding: 5px 6px;
+      background: #222;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 4px;
+    }
+    .crossfade-form input[type="checkbox"] { accent-color: #fbbf24; }
+    .crossfade-form button {
+      background: #fbbf24;
+      color: #111;
+      border: none;
+      border-radius: 6px;
+      padding: 7px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .crossfade-form button:disabled { opacity: 0.5; }
+    .crossfade-form p { color: #aaa; line-height: 1.4; }
+    .crossfade-form output:empty { display: none; }
+
     /* Status genérico */
     #status {
       font-size: 11px;
@@ -260,16 +303,16 @@
         </div>
       </div>
 
-      <div class="menu-item disabled" id="menu-crossfade">
-        <div class="left">
+      <button type="button" class="menu-item" id="menu-crossfade">
+        <span class="left">
           <span class="icon">🎵</span>
-          <div class="info">
-            <div class="title">Crossfade</div>
-            <div class="desc">Fundido entre canciones</div>
-          </div>
-        </div>
-        <span class="coming-soon">próximo</span>
-      </div>
+          <span class="info">
+            <span class="title">Crossfade</span>
+            <span class="desc" style="display:block">Fundido entre canciones</span>
+          </span>
+        </span>
+        <span class="arrow" aria-hidden="true">›</span>
+      </button>
 
       <div class="menu-item disabled" id="menu-eq">
         <div class="left">
@@ -323,6 +366,22 @@
     </div>
   </div>
 
-  <script src="popup.js"></script>
+  <div id="view-crossfade" class="view">
+    <div class="header">
+      <button class="back" id="crossfadeBack" aria-label="Volver">‹</button>
+      <h2>Crossfade</h2>
+    </div>
+    <form class="crossfade-form" id="crossfadeForm">
+      <label>Activar en YouTube Music <input id="crossfadeEnabled" type="checkbox" /></label>
+      <label>Salida (segundos) <input id="fadeOut" type="number" min="0" step="0.1" required /></label>
+      <label>Entrada (segundos) <input id="fadeIn" type="number" min="0" step="0.1" required /></label>
+      <p>Se aplica al pulsar Siguiente. Usa 0 para omitir un fundido.</p>
+      <p id="crossfadeConnection" role="status"></p>
+      <button type="submit" disabled>Guardar</button>
+      <output id="crossfadeStatus" role="status"></output>
+    </form>
+  </div>
+
+  <script type="module" src="popup.js"></script>
 </body>
 </html>
