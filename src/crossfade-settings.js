@@ -4,14 +4,16 @@ export const MAX_FADE_SECONDS = 10
 export const DEFAULT_CROSSFADE = Object.freeze({
   enabled: true,
   fadeOut: 2,
-  fadeIn: 2
+  fadeIn: 2,
+  trimSilence: false
 })
 
 export function normalizeCrossfade(settings) {
   return {
     enabled: settings?.enabled !== false,
     fadeOut: normalizeSeconds(settings?.fadeOut, DEFAULT_CROSSFADE.fadeOut),
-    fadeIn: normalizeSeconds(settings?.fadeIn, DEFAULT_CROSSFADE.fadeIn)
+    fadeIn: normalizeSeconds(settings?.fadeIn, DEFAULT_CROSSFADE.fadeIn),
+    trimSilence: settings?.trimSilence === true
   }
 }
 

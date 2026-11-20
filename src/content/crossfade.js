@@ -1,4 +1,5 @@
 import { CROSSFADE_KEY, DEFAULT_CROSSFADE, normalizeCrossfade } from '../crossfade-settings.js'
+import { openSilenceAnalyzer, scanInitialSilence } from './initial-silence.js'
 
 const NEXT_BUTTON = [
   '.ytmusicPlayerControlsNextButton button',
@@ -6,6 +7,8 @@ const NEXT_BUTTON = [
 ].join(', ')
 const POLL_MS = 25
 const LOAD_TIMEOUT_MS = 8000
+const SEEK_TIMEOUT_MS = 1200
+const ANALYZER_WINDOW_MS = 65
 
 function isAvailable(button) {
   return button?.isConnected && !button.disabled && button.getAttribute('aria-disabled') !== 'true'
@@ -29,9 +32,16 @@ export function bindCrossfade(getVideo) {
     if (area === 'local' && changes[CROSSFADE_KEY]) {
       settingsUpdated = true
       settings = normalizeCrossfade(changes[CROSSFADE_KEY].newValue)
+      const state = transition
+      if (!state) return
+      if (!settings.trimSilence) {
+        if (state.scan) completeScan(state, { time: state.scan.startTime, detected: false })
+        else stopAnalysis(state)
+      }
       if (!settings.enabled) {
-        if (transition?.phase === 'out') advance(transition)
-        else finish()
+        state.fadeIn = 0
+        if (state.phase === 'out') advance(state, Boolean(state.audioContext))
+        else if (state.phase === 'in' || (state.phase === 'load' && !state.audioContext)) finish()
       }
     }
   })
@@ -63,10 +73,11 @@ export function bindCrossfade(getVideo) {
     const state = transition
     transition = undefined
     clearInterval(state.timer)
+    stopAnalysis(state)
     restoreVolume(state)
   }
 
-  function advance(state, useTransition = settings.enabled) {
+  function advance(state, useTransition = settings.enabled || Boolean(state.audioContext)) {
     const button = isAvailable(state.button)
       ? state.button
       : [...document.querySelectorAll(NEXT_BUTTON)].find(isAvailable)
@@ -111,7 +122,37 @@ export function bindCrossfade(getVideo) {
     writeVolume(state, 0)
   }
 
+  function stopAnalysis(state) {
+    state.scan?.stop()
+    state.scan = undefined
+    state.audioContext?.close().catch(() => {})
+    state.audioContext = undefined
+  }
+
+  function beginIncoming(state) {
+    state.scan = scanInitialSilence(state.audioContext, state.video)
+    if (state.scan) {
+      state.phase = 'scan'
+      state.source = state.video.currentSrc
+    } else {
+      startFadeIn(state)
+    }
+  }
+
+  function completeScan(state, { time, detected }) {
+    if (detected && time > state.scan.startTime + 0.05) state.scan.restoreRate()
+    else stopAnalysis(state)
+    if (Math.abs(state.video.currentTime - time) > 0.02) {
+      state.phase = 'seek'
+      state.started = performance.now()
+      state.video.currentTime = time
+    } else {
+      startFadeIn(state)
+    }
+  }
+
   function startFadeIn(state) {
+    stopAnalysis(state)
     if (!state.fadeIn) {
       finish()
       return
@@ -133,7 +174,7 @@ export function bindCrossfade(getVideo) {
           video.currentTime > state.observedTime
         prepareIncoming(state, video)
         state.observedTime = video.currentTime
-        if (playing) startFadeIn(state)
+        if (playing) beginIncoming(state)
       }
       return
     }
@@ -153,7 +194,31 @@ export function bindCrossfade(getVideo) {
       return
     }
 
-    if (state.phase === 'out') {
+    if (state.phase === 'scan') {
+      const result = state.scan.read()
+      if (result) completeScan(state, result)
+      else writeVolume(state, 0)
+    } else if (state.phase === 'seek') {
+      if (elapsed >= SEEK_TIMEOUT_MS) {
+        startFadeIn(state)
+      } else if (!video.seeking && state.scan) {
+        state.phase = 'confirm'
+        state.started = performance.now()
+        state.confirmTimeout = Math.min(1500, Math.max(450, 650 / video.playbackRate))
+      } else if (!video.seeking) {
+        startFadeIn(state)
+      } else {
+        writeVolume(state, 0)
+      }
+    } else if (state.phase === 'confirm') {
+      // Let the analyzer's buffer refill at normal speed after the seek.
+      if (elapsed >= state.confirmTimeout ||
+        (elapsed >= ANALYZER_WINDOW_MS && state.scan.detectsSound())) {
+        startFadeIn(state)
+      } else {
+        writeVolume(state, 0)
+      }
+    } else if (state.phase === 'out') {
       const progress = Math.min(1, elapsed / state.fadeOut)
       writeVolume(state, state.startFactor * (1 - progress))
       if (progress === 1) advance(state)
@@ -164,21 +229,25 @@ export function bindCrossfade(getVideo) {
   }
 
   window.addEventListener('click', (event) => {
-    if (nativeClick || !settings.enabled) return
+    if (nativeClick || (!settings.enabled && !settings.trimSilence)) return
     const button = event.composedPath().find((node) => node.matches?.(NEXT_BUTTON))
     if (!isAvailable(button)) return
 
-    if (transition?.phase === 'out' || transition?.phase === 'load') {
+    if (transition && transition.phase !== 'in') {
       event.preventDefault()
       event.stopImmediatePropagation()
       return
     }
 
     const video = getVideo()
-    const { fadeOut, fadeIn } = settings
+    const fadeOut = settings.enabled ? settings.fadeOut : 0
+    const fadeIn = settings.enabled ? settings.fadeIn : 0
     if (!video || video.paused || video.ended || video.muted ||
       (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA && video.currentTime === 0) ||
-      video.volume === 0 || isAd(video) || (!fadeOut && !fadeIn)) return
+      video.volume === 0 || isAd(video) || (!fadeOut && !fadeIn && !settings.trimSilence)) return
+
+    const audioContext = settings.trimSilence ? openSilenceAnalyzer() : null
+    if (!fadeOut && !fadeIn && !audioContext) return
 
     const volume = transition?.video === video && transition.lastVolume === video.volume
       ? transition.volume
@@ -199,12 +268,17 @@ export function bindCrossfade(getVideo) {
       started: performance.now(),
       startFactor: startingVolume / volume,
       fadeOut: fadeOut * 1000,
-      fadeIn: fadeIn * 1000
+      fadeIn: fadeIn * 1000,
+      audioContext
     }
     if (video.volume !== startingVolume) video.volume = startingVolume
     transition = state
     state.timer = setInterval(() => tick(state), POLL_MS)
-    if (!fadeOut) advance(state)
+    if (!fadeOut) {
+      setTimeout(() => {
+        if (transition === state && state.phase === 'out') advance(state)
+      }, 0)
+    }
   }, { capture: true, passive: false })
 
   document.addEventListener('loadstart', (event) => {
@@ -228,7 +302,7 @@ export function bindCrossfade(getVideo) {
       finish()
     } else if (hasNewTrack(state, video)) {
       prepareIncoming(state, video)
-      startFadeIn(state)
+      beginIncoming(state)
     }
   }, true)
 

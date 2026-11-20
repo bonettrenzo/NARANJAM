@@ -16,6 +16,10 @@ de velocidad de reproducción sobre el reproductor de YouTube.
   avanzar y lo sube al empezar la nueva. En **NARANJAM → Crossfade** puedes
   ajustar cada fundido entre 0 y 10 segundos o desactivar la función. El valor
   inicial es de 2 segundos por fundido.
+- **Omitir silencio inicial** está desactivada por defecto. Al pulsar
+  **Siguiente**, analiza hasta los primeros 4 segundos de la próxima pista y
+  arranca el fundido de entrada cerca del primer sonido. Si no detecta audio
+  en ese tramo, vuelve al inicio de la pista.
 
 ## Cargar la extensión en Chrome
 

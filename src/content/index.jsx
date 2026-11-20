@@ -1,4 +1,4 @@
-import { clampSpeed, setVideoSpeed, readPrefSpeed, savePrefSpeed } from './speed.js'
+import { clampSpeed, getVideoSpeed, isTemporaryPlaybackRate, readPrefSpeed, savePrefSpeed, setVideoSpeed } from './speed.js'
 import { bindCrossfade } from './crossfade.js'
 
 /**
@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   const video = getVideo()
 
   if (msg.type === 'GET_SPEED') {
-    sendResponse({ speed: video ? video.playbackRate : 1 })
+    sendResponse({ speed: video ? getVideoSpeed(video) : 1 })
     return true
   }
 
@@ -50,9 +50,9 @@ function bindKeyboardShortcuts() {
 
     let handled = true
     if (e.key === '+' || e.key === '=') {
-      setVideoSpeed(video, clampSpeed(video.playbackRate + 0.25))
+      setVideoSpeed(video, clampSpeed(getVideoSpeed(video) + 0.25))
     } else if (e.key === '-') {
-      setVideoSpeed(video, clampSpeed(video.playbackRate - 0.25))
+      setVideoSpeed(video, clampSpeed(getVideoSpeed(video) - 0.25))
     } else if (e.key === 'r' || e.key === 'R') {
       setVideoSpeed(video, 1)
     } else if (e.key === 'c' || e.key === 'C') {
@@ -68,7 +68,7 @@ function bindKeyboardShortcuts() {
 function observeRateChanges() {
   document.addEventListener('ratechange', (e) => {
     const video = e.target
-    if (video && video.tagName === 'VIDEO' && video.playbackRate > 0) {
+    if (video && video.tagName === 'VIDEO' && video.playbackRate > 0 && !isTemporaryPlaybackRate(video)) {
       savePrefSpeed(video.playbackRate)
     }
   }, true)

@@ -41,6 +41,7 @@ const crossfadeForm = document.getElementById('crossfadeForm')
 const crossfadeEnabled = document.getElementById('crossfadeEnabled')
 const fadeOut = document.getElementById('fadeOut')
 const fadeIn = document.getElementById('fadeIn')
+const trimSilence = document.getElementById('trimSilence')
 const crossfadeConnection = document.getElementById('crossfadeConnection')
 const crossfadeStatus = document.getElementById('crossfadeStatus')
 const saveCrossfade = crossfadeForm.querySelector('button[type="submit"]')
@@ -77,6 +78,7 @@ chrome.storage.local.get(CROSSFADE_KEY, (stored) => {
   crossfadeEnabled.checked = settings.enabled
   fadeOut.value = settings.fadeOut
   fadeIn.value = settings.fadeIn
+  trimSilence.checked = settings.trimSilence
   saveCrossfade.disabled = false
 })
 
@@ -90,7 +92,8 @@ crossfadeForm.addEventListener('submit', async (event) => {
   const settings = normalizeCrossfade({
     enabled: crossfadeEnabled.checked,
     fadeOut: fadeOut.valueAsNumber,
-    fadeIn: fadeIn.valueAsNumber
+    fadeIn: fadeIn.valueAsNumber,
+    trimSilence: trimSilence.checked
   })
   try {
     await chrome.storage.local.set({ [CROSSFADE_KEY]: settings })
